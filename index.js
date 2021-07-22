@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 
 const app = express();
 
+const usersRoute = require('./routes/users')
+
 //  задаём порт (ведь мы его вроде как не передаем в окружение)
 const { PORT = 3000 } = process.env;
 
@@ -15,6 +17,11 @@ mongoose.connect("mongodb://localhost:27017/mestodb", {
 });
 
 // подключаем мидлвары, роуты и всё остальное...
+//bodyparser теперь часть экспресса, поэтому подключаем его так
+app.use(express.json());
+
+//Прописываем маршруты
+app.use('/', usersRoute);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
