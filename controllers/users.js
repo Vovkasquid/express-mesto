@@ -1,38 +1,38 @@
 const User = require("../models/user");
-console.log("USER =", User)
+console.log("USER =", User);
 
-//колбек для получения всех пользователей
+// колбек для получения всех пользователей
 const getAllUsers = (req, res) => {
   User.find({})
-    .then(users => {
-      res.status(200).send({data: users});
+    .then((users) => {
+      res.status(200).send({ data: users });
     })
-    .catch(err => {
-      res.status(500).send({message: 'Что-то пошло не так'});
+    .catch((err) => {
+      res.status(500).send({ message: err });
     });
-}
+};
 
-//колбек для получения определённого пользователя
+// колбек для получения определённого пользователя
 const getUser = (req, res) => {
   User.findById(req.params.id)
-    .then(user => {
-      res.status(200).send({data: user});
+    .then((user) => {
+      res.status(200).send({ data: user });
     })
-    .catch(err => {
-      res.status(500).send({message: 'Что-то пошло не так'});
+    .catch((err) => {
+      res.status(500).send({ message: err });
     });
-}
+};
 
-//колбек для создания нового пользователя
+// колбек для создания нового пользователя
 const createUser = (req, res) => {
 
-  console.log('body', req);
+  console.log("body", req);
   const { name, about, avatar } = req.body;
-  User.create({name, about, avatar})
-    .then(user => res.send({data: user}))
-    .catch(err => {
-      res.status(500).send({message: err});
+  User.create({ name, about, avatar })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      res.status(500).send({ message: err });
     });
-}
+};
 
 module.exports = { getAllUsers, getUser, createUser };
