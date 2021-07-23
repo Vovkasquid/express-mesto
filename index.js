@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 
 const app = express();
 
+// Подключаем роуты
 const usersRoute = require("./routes/users");
+const cardsRoute = require("./routes/cards");
 
 //  задаём порт (ведь мы его вроде как не передаем в окружение)
 const { PORT = 3000 } = process.env;
@@ -33,6 +35,7 @@ app.use((req, res, next) => {
 });
 // Прописываем маршруты
 app.use("/", usersRoute);
+app.use("/", cardsRoute);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
