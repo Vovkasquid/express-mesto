@@ -1,23 +1,14 @@
 const router = require("express").Router();
-
+const { getAllCards, createCard, deleteCard } = require("../controllers/cards");
 /* GET /cards — возвращает все карточки
    POST /cards — создаёт карточку
    DELETE /cards/:cardId — удаляет карточку по идентификатору
 */
 
-router.get("/cards", (req, res) => {
-  console.log('GET /cards');
-  res.status(200).send({ message: 'success get' });
-});
+router.get("/cards", getAllCards);
 
-router.post("/cards", (req, res) => {
-  console.log('POST /cards');
-  res.status(200).send({ message: 'success post' });
-});
+router.post("/cards", createCard);
 
-router.delete("/cards/:cardId", (req, res) => {
-  console.log("DELETE CARDS");
-  res.status(200).send({message: "success delete"});
-});
+router.delete("/cards/:cardId", deleteCard);
 
 module.exports = router;

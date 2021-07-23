@@ -41,4 +41,4 @@ const deleteCard = (req, res) => {
     });
 };
 
-module.export = { getAllCards, createCard, deleteCard };
+module.exports = { getAllCards, createCard, deleteCard };
