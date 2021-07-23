@@ -14,7 +14,7 @@ const getAllUsers = (req, res) => {
 
 // колбек для получения определённого пользователя
 const getUser = (req, res) => {
-  User.findById(req.params.id)
+  User.findById(req.params.userId)
     .then((user) => {
       res.status(200).send({ data: user });
     })
@@ -25,7 +25,6 @@ const getUser = (req, res) => {
 
 // колбек для создания нового пользователя
 const createUser = (req, res) => {
-
   console.log("body", req);
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
