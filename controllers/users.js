@@ -1,4 +1,5 @@
-const User = require('../models/user');
+const User = require("../models/user");
+console.log("USER =", User)
 
 //колбек для получения всех пользователей
 const getAllUsers = (req, res) => {
@@ -24,11 +25,13 @@ const getUser = (req, res) => {
 
 //колбек для создания нового пользователя
 const createUser = (req, res) => {
+
+  console.log('body', req);
   const { name, about, avatar } = req.body;
   User.create({name, about, avatar})
     .then(user => res.send({data: user}))
     .catch(err => {
-      res.status(500).send({message: 'Что-то пошло не так'});
+      res.status(500).send({message: err});
     });
 }
 
