@@ -10,8 +10,10 @@ const cardsRoute = require("./routes/cards");
 //  задаём порт (ведь мы его вроде как не передаем в окружение)
 const { PORT = 3000 } = process.env;
 
-// UserID
+// UserID (домашний ноут)
 // 60faca1425a4332fafbed7f5
+// Рабочий ноут
+// 60fed35272c3164788b36dd1
 
 // подключаемся к серверу mongo
 mongoose.connect("mongodb://localhost:27017/mestodb", {
@@ -28,7 +30,7 @@ app.use(express.json());
 // костыль для авторизации. В ПР14 будет удалён
 app.use((req, res, next) => {
   req.user = {
-    _id: "60faca1425a4332fafbed7f5",
+    _id: "60fed35272c3164788b36dd1",
   };
 
   next();
