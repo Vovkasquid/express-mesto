@@ -13,7 +13,7 @@ const { PORT = 3000 } = process.env;
 // UserID (домашний ноут)
 // 60faca1425a4332fafbed7f5
 // Рабочий ноут
-// 60fed35272c3164788b36dd1
+// 60fede285680401b6c9c9a41
 
 // подключаемся к серверу mongo
 mongoose.connect("mongodb://localhost:27017/mestodb", {
@@ -30,7 +30,7 @@ app.use(express.json());
 // костыль для авторизации. В ПР14 будет удалён
 app.use((req, res, next) => {
   req.user = {
-    _id: "60fed35272c3164788b36dd1",
+    _id: "60fede285680401b6c9c9a41",
   };
 
   next();
