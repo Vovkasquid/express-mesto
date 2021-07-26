@@ -1,4 +1,5 @@
 const User = require("../models/user");
+
 console.log("USER =", User);
 
 // колбек для получения всех пользователей
@@ -34,4 +35,26 @@ const createUser = (req, res) => {
     });
 };
 
-module.exports = { getAllUsers, getUser, createUser };
+/*  PATCH /users/me — обновляет профиль
+    PATCH /users/me/avatar — обновляет аватар
+*/
+
+const updateUserInfo = (req, res) => {
+  console.log("Body in PATCH USER=", req.body);
+  const { name, about } = req.body;
+  const userID = req.user._id;
+  // найдём пользователя по ID
+  User.findByIdAndUpdate(userID, { name, about }, {
+    new: true,
+    runValidators: true,
+    upsert: false,
+  })
+    .then((newUserInfo) => {
+      res.status(200).send({ data: newUserInfo });
+    })
+    .catch((err) => res.status(500).send({ message: err }));
+};
+
+module.exports = {
+  getAllUsers, getUser, createUser, updateUserInfo,
+};
