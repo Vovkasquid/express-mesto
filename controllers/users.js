@@ -37,12 +37,15 @@ const getUser = (req, res) => {
 
 // колбек для создания нового пользователя
 const createUser = (req, res) => {
-  console.log("body", req);
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      res.status(500).send({ message: err });
+      if (err.name === "ValidationError") {
+        res.status(400).send({ message: "Переданы некорректные данные при создании пользователя" });
+      } else {
+        res.status(500).send({ message: "Что-то пошло не так :(" });
+      }
     });
 };
 
