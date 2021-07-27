@@ -6,6 +6,9 @@
 */
 
 const Card = require("../models/card");
+const ERROR_CODE_NOT_FOUND = 404;
+const ERROR_CODE_BAD_REQUEST = 400;
+const ERROR_CODE_DEFAULT_ERROR = 500;
 
 const getAllCards = (req, res) => {
   Card.find({})
@@ -13,7 +16,7 @@ const getAllCards = (req, res) => {
       res.status(200).send({ data: cards });
     })
     .catch(() => {
-      res.status(500).send({ message: "Что-то пошло не так :(" });
+      res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
     });
 };
 
@@ -26,9 +29,9 @@ const createCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(400).send({ message: "Переданы некорректные данные при создании пользователя" });
+        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Переданы некорректные данные при создании пользователя" });
       } else {
-        res.status(500).send({ message: "Что-то пошло не так :(" });
+        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
       }
     });
 };
@@ -40,7 +43,7 @@ const deleteCard = (req, res) => {
       // Если мы здесь, значит запрос в базе ничего не нашёл
       // Бросаем ошибку и попадаем в catch
       const error = new Error("Карточка с заданным ID отсутствует в базе данных");
-      error.statusCode = 404;
+      error.statusCode = ERROR_CODE_NOT_FOUND;
       throw error;
     })
     .then((card) => {
@@ -50,11 +53,11 @@ const deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.statusCode === 404) {
-        res.status(404).send({ message: err.message });
+        res.status(ERROR_CODE_NOT_FOUND).send({ message: err.message });
       } else if (err.name === "CastError") {
-        res.status(400).send({ message: "Ошибка в формате ID карточки" });
+        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Ошибка в формате ID карточки" });
       } else {
-        res.status(500).send({ message: "Что-то пошло не так :(" });
+        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
       }
     });
 };
@@ -69,19 +72,19 @@ const likeCard = (req, res) => {
       // Если мы здесь, значит запрос в базе ничего не нашёл
       // Бросаем ошибку и попадаем в catch
       const error = new Error("Карточка с заданным ID отсутствует в базе данных");
-      error.statusCode = 404;
+      error.statusCode = ERROR_CODE_NOT_FOUND;
       throw error;
     })
     .then((card) => {
       res.status(200).send({ data: card });
     })
     .catch((err) => {
-      if (err.statusCode === 404) {
-        res.status(404).send({ message: err.message });
+      if (err.statusCode === ERROR_CODE_NOT_FOUND) {
+        res.status(ERROR_CODE_NOT_FOUND).send({ message: err.message });
       } else if (err.name === "CastError") {
-        res.status(400).send({ message: "Ошибка в формате ID карточки" });
+        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Ошибка в формате ID карточки" });
       } else {
-        res.status(500).send({ message: "Что-то пошло не так :(" });
+        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
       }
     });
 };
@@ -96,19 +99,19 @@ const dislikeCard = (req, res) => {
       // Если мы здесь, значит запрос в базе ничего не нашёл
       // Бросаем ошибку и попадаем в catch
       const error = new Error("Карточка с заданным ID отсутствует в базе данных");
-      error.statusCode = 404;
+      error.statusCode = ERROR_CODE_NOT_FOUND;
       throw error;
     })
     .then((card) => {
       res.status(200).send({ data: card });
     })
     .catch((err) => {
-      if (err.statusCode === 404) {
-        res.status(404).send({ message: err.message });
+      if (err.statusCode === ERROR_CODE_NOT_FOUND) {
+        res.status(ERROR_CODE_NOT_FOUND).send({ message: err.message });
       } else if (err.name === "CastError") {
-        res.status(400).send({ message: "Ошибка в формате ID карточки" });
+        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Ошибка в формате ID карточки" });
       } else {
-        res.status(500).send({ message: "Что-то пошло не так :(" });
+        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
       }
     });
 };
