@@ -1,5 +1,8 @@
 const router = require("express").Router();
-const { getAllCards, createCard, deleteCard, likeCard, dislikeCard } = require("../controllers/cards");
+const {
+  getAllCards, createCard, deleteCard, likeCard, dislikeCard,
+} = require("../controllers/cards");
+
 /* GET /cards — возвращает все карточки
    POST /cards — создаёт карточку
    DELETE /cards/:cardId — удаляет карточку по идентификатору

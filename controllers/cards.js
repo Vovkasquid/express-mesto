@@ -7,15 +7,13 @@
 
 const Card = require("../models/card");
 
-console.log("CARD =", Card);
-
 const getAllCards = (req, res) => {
   Card.find({})
     .then((cards) => {
       res.status(200).send({ data: cards });
     })
-    .catch((err) => {
-      console.log(err);
+    .catch(() => {
+      res.status(500).send({ message: "Что-то пошло не так :(" });
     });
 };
 
@@ -27,7 +25,7 @@ const createCard = (req, res) => {
       res.status(200).send({ data: card });
     })
     .catch((err) => {
-      console.log(err);
+      console.log(err.name);
     });
 };
 
