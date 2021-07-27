@@ -1,5 +1,9 @@
 const User = require("../models/user");
 
+const ERROR_CODE_NOT_FOUND = 404;
+const ERROR_CODE_BAD_REQUEST = 400;
+const ERROR_CODE_DEFAULT_ERROR = 500;
+
 // колбек для получения всех пользователей
 const getAllUsers = (req, res) => {
   User.find({})
@@ -7,7 +11,7 @@ const getAllUsers = (req, res) => {
       res.status(200).send({ data: users });
     })
     .catch(() => {
-      res.status(500).send({ message: "Что-то пошло не так :(" });
+      res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
     });
 };
 
@@ -18,19 +22,19 @@ const getUser = (req, res) => {
       // Если мы здесь, значит запрос в базе ничего не нашёл
       // Бросаем ошибку и попадаем в catch
       const error = new Error("Пользователь по заданному ID отсутствует в базе данных");
-      error.statusCode = 404;
+      error.statusCode = ERROR_CODE_NOT_FOUND;
       throw error;
     })
     .then((user) => {
       res.status(200).send({ data: user });
     })
     .catch((err) => {
-      if (err.statusCode === 404) {
-        res.status(404).send({ message: err.message });
+      if (err.statusCode === ERROR_CODE_NOT_FOUND) {
+        res.status(ERROR_CODE_NOT_FOUND).send({ message: err.message });
       } else if (err.name === "CastError") {
-        res.status(400).send({ message: "Ошибка в формате ID пользователя" });
+        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Ошибка в формате ID пользователя" });
       } else {
-        res.status(500).send({ message: "Что-то пошло не так :(" });
+        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
       }
     });
 };
@@ -42,9 +46,9 @@ const createUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(400).send({ message: "Переданы некорректные данные при создании пользователя" });
+        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Переданы некорректные данные при создании пользователя" });
       } else {
-        res.status(500).send({ message: "Что-то пошло не так :(" });
+        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
       }
     });
 };
@@ -66,21 +70,21 @@ const updateUserInfo = (req, res) => {
       // Если мы здесь, значит запрос в базе ничего не нашёл
       // Бросаем ошибку и попадаем в catch
       const error = new Error("Пользователь по заданному ID отсутствует в базе данных");
-      error.statusCode = 404;
+      error.statusCode = ERROR_CODE_NOT_FOUND;
       throw error;
     })
     .then((newUserInfo) => {
       res.status(200).send({ data: newUserInfo });
     })
     .catch((err) => {
-      if (err.statusCode === 404) {
-        res.status(404).send({ message: err.message });
+      if (err.statusCode === ERROR_CODE_NOT_FOUND) {
+        res.status(ERROR_CODE_NOT_FOUND).send({ message: err.message });
       } else if (err.name === "CastError") {
-        res.status(400).send({ message: "Ошибка в формате ID пользователя" });
+        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Ошибка в формате ID пользователя" });
       } else if (err.name === "ValidationError") {
-        res.status(400).send({ message: "Переданы некорректные данные при обновлении данных пользователя" });
+        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Переданы некорректные данные при обновлении данных пользователя" });
       } else {
-        res.status(500).send({ message: "Что-то пошло не так :(" });
+        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
       }
     });
 };
