@@ -1,26 +1,37 @@
 const User = require("../models/user");
 
-console.log("USER =", User);
-
 // колбек для получения всех пользователей
 const getAllUsers = (req, res) => {
   User.find({})
     .then((users) => {
       res.status(200).send({ data: users });
     })
-    .catch((err) => {
-      res.status(500).send({ message: err });
+    .catch(() => {
+      res.status(500).send({ message: "Что-то пошло не так :(" });
     });
 };
 
 // колбек для получения определённого пользователя
 const getUser = (req, res) => {
   User.findById(req.params.userId)
+    .orFail(() => {
+      // Если мы здесь, значит запрос в базе ничего не нашёл
+      // Бросаем ошибку и попадаем в catch
+      const error = new Error("Пользователь по заданному ID отсутствует в базе данных");
+      error.statusCode = 404;
+      throw error;
+    })
     .then((user) => {
       res.status(200).send({ data: user });
     })
     .catch((err) => {
-      res.status(500).send({ message: err });
+      if (err.statusCode === 404) {
+        res.status(404).send({ message: err.message });
+      } if (err.name === "CastError") {
+        res.status(404).send({ message: "Ошибка в формате ID" });
+      } else {
+        res.status(500).send({ message: err.name });
+      }
     });
 };
 
