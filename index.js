@@ -9,6 +9,7 @@ const cardsRoute = require("./routes/cards");
 
 //  задаём порт (ведь мы его вроде как не передаем в окружение)
 const { PORT = 3000 } = process.env;
+const ERROR_CODE_NOT_FOUND = 404;
 
 // UserID (домашний ноут)
 // 60faca1425a4332fafbed7f5
@@ -38,6 +39,10 @@ app.use((req, res, next) => {
 // Прописываем маршруты
 app.use("/", usersRoute);
 app.use("/", cardsRoute);
+// Обработаем некорректный маршрут и вернём ошибку 404
+app.use("*", (req, res) => {
+  res.status(ERROR_CODE_NOT_FOUND).send({ message: `Страницы по адресу ${req.baseUrl} не существует` });
+});
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
