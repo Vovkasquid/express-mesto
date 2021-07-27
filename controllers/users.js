@@ -89,6 +89,38 @@ const updateUserInfo = (req, res) => {
     });
 };
 
+const updateUserAvatar = (req, res) => {
+  const { avatar } = req.body;
+  const userID = req.user._id;
+  // найдём пользователя по ID
+  User.findByIdAndUpdate(userID, { avatar }, {
+    new: true,
+    runValidators: true,
+    upsert: false,
+  })
+    .orFail(() => {
+      // Если мы здесь, значит запрос в базе ничего не нашёл
+      // Бросаем ошибку и попадаем в catch
+      const error = new Error("Пользователь по заданному ID отсутствует в базе данных");
+      error.statusCode = ERROR_CODE_NOT_FOUND;
+      throw error;
+    })
+    .then((newUserInfo) => {
+      res.status(200).send({ data: newUserInfo });
+    })
+    .catch((err) => {
+      if (err.statusCode === ERROR_CODE_NOT_FOUND) {
+        res.status(ERROR_CODE_NOT_FOUND).send({ message: err.message });
+      } else if (err.name === "CastError") {
+        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Ошибка в формате ID пользователя" });
+      } else if (err.name === "ValidationError") {
+        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Переданы некорректные данные при обновлении аватара пользователя" });
+      } else {
+        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
+      }
+    });
+};
+
 module.exports = {
-  getAllUsers, getUser, createUser, updateUserInfo,
+  getAllUsers, getUser, createUser, updateUserInfo, updateUserAvatar,
 };

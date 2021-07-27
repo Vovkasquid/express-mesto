@@ -30,7 +30,7 @@ app.use(express.json());
 // костыль для авторизации. В ПР14 будет удалён
 app.use((req, res, next) => {
   req.user = {
-    _id: "60fede285680401b6c9c9a41",
+    _id: "60faca1425a4332fafbed7f5",
   };
 
   next();
