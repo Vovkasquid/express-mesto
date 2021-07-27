@@ -30,7 +30,7 @@ const getUser = (req, res) => {
       } if (err.name === "CastError") {
         res.status(404).send({ message: "Ошибка в формате ID" });
       } else {
-        res.status(500).send({ message: err.name });
+        res.status(500).send({ message: "Что-то пошло не так :(" });
       }
     });
 };
@@ -54,7 +54,6 @@ const createUser = (req, res) => {
 */
 
 const updateUserInfo = (req, res) => {
-  console.log("Body in PATCH USER=", req.body);
   const { name, about } = req.body;
   const userID = req.user._id;
   // найдём пользователя по ID
@@ -63,10 +62,27 @@ const updateUserInfo = (req, res) => {
     runValidators: true,
     upsert: false,
   })
+    .orFail(() => {
+      // Если мы здесь, значит запрос в базе ничего не нашёл
+      // Бросаем ошибку и попадаем в catch
+      const error = new Error("Пользователь по заданному ID отсутствует в базе данных");
+      error.statusCode = 404;
+      throw error;
+    })
     .then((newUserInfo) => {
       res.status(200).send({ data: newUserInfo });
     })
-    .catch((err) => res.status(500).send({ message: err }));
+    .catch((err) => {
+      if (err.statusCode === 404) {
+        res.status(404).send({ message: err.message });
+      } if (err.name === "CastError") {
+        res.status(404).send({ message: "Ошибка в формате ID" });
+      } if (err.name === "ValidationError") {
+        res.status(400).send({ message: "Переданы некорректные данные при обновлении данных пользователя" });
+      } else {
+        res.status(500).send({ message: "Что-то пошло не так :(" });
+      }
+    });
 };
 
 module.exports = {
