@@ -36,13 +36,26 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   // найдём карточку и удалим её
   Card.findById(req.params.cardId)
+    .orFail(() => {
+      // Если мы здесь, значит запрос в базе ничего не нашёл
+      // Бросаем ошибку и попадаем в catch
+      const error = new Error("Карточка с заданным ID отсутствует в базе данных");
+      error.statusCode = 404;
+      throw error;
+    })
     .then((card) => {
       card.remove();
       res.status(200)
         .send({ message: `Карточка с id ${card.id} успешно удалена!` });
     })
     .catch((err) => {
-      console.log(err);
+      if (err.statusCode === 404) {
+        res.status(404).send({ message: err.message });
+      } else if (err.name === "CastError") {
+        res.status(404).send({ message: "Ошибка в формате ID карточки" });
+      } else {
+        res.status(500).send({ message: "Что-то пошло не так :(" });
+      }
     });
 };
 
