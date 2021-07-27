@@ -105,8 +105,8 @@ const updateUserAvatar = (req, res) => {
       error.statusCode = ERROR_CODE_NOT_FOUND;
       throw error;
     })
-    .then((newUserInfo) => {
-      res.status(200).send({ data: newUserInfo });
+    .then((newUserData) => {
+      res.status(200).send({ data: newUserData });
     })
     .catch((err) => {
       if (err.statusCode === ERROR_CODE_NOT_FOUND) {
