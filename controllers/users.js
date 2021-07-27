@@ -28,7 +28,7 @@ const getUser = (req, res) => {
       if (err.statusCode === 404) {
         res.status(404).send({ message: err.message });
       } else if (err.name === "CastError") {
-        res.status(404).send({ message: "Ошибка в формате ID" });
+        res.status(400).send({ message: "Ошибка в формате ID пользователя" });
       } else {
         res.status(500).send({ message: "Что-то пошло не так :(" });
       }
@@ -76,7 +76,7 @@ const updateUserInfo = (req, res) => {
       if (err.statusCode === 404) {
         res.status(404).send({ message: err.message });
       } else if (err.name === "CastError") {
-        res.status(404).send({ message: "Ошибка в формате ID" });
+        res.status(400).send({ message: "Ошибка в формате ID пользователя" });
       } else if (err.name === "ValidationError") {
         res.status(400).send({ message: "Переданы некорректные данные при обновлении данных пользователя" });
       } else {

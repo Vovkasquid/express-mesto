@@ -52,7 +52,7 @@ const deleteCard = (req, res) => {
       if (err.statusCode === 404) {
         res.status(404).send({ message: err.message });
       } else if (err.name === "CastError") {
-        res.status(404).send({ message: "Ошибка в формате ID карточки" });
+        res.status(400).send({ message: "Ошибка в формате ID карточки" });
       } else {
         res.status(500).send({ message: "Что-то пошло не так :(" });
       }
@@ -65,10 +65,25 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
+    .orFail(() => {
+      // Если мы здесь, значит запрос в базе ничего не нашёл
+      // Бросаем ошибку и попадаем в catch
+      const error = new Error("Карточка с заданным ID отсутствует в базе данных");
+      error.statusCode = 404;
+      throw error;
+    })
     .then((card) => {
       res.status(200).send({ data: card });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      if (err.statusCode === 404) {
+        res.status(404).send({ message: err.message });
+      } else if (err.name === "CastError") {
+        res.status(400).send({ message: "Ошибка в формате ID карточки" });
+      } else {
+        res.status(500).send({ message: "Что-то пошло не так :(" });
+      }
+    });
 };
 
 const dislikeCard = (req, res) => {
@@ -77,10 +92,25 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
+    .orFail(() => {
+      // Если мы здесь, значит запрос в базе ничего не нашёл
+      // Бросаем ошибку и попадаем в catch
+      const error = new Error("Карточка с заданным ID отсутствует в базе данных");
+      error.statusCode = 404;
+      throw error;
+    })
     .then((card) => {
       res.status(200).send({ data: card });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      if (err.statusCode === 404) {
+        res.status(404).send({ message: err.message });
+      } else if (err.name === "CastError") {
+        res.status(400).send({ message: "Ошибка в формате ID карточки" });
+      } else {
+        res.status(500).send({ message: "Что-то пошло не так :(" });
+      }
+    });
 };
 
 module.exports = {
