@@ -1,3 +1,4 @@
+const bcrypt = require("bcryptjs"); // импортируем bcrypt
 const User = require("../models/user");
 
 const ERROR_CODE_NOT_FOUND = 404;
@@ -41,15 +42,25 @@ const getUser = (req, res) => {
 
 // колбек для создания нового пользователя
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Переданы некорректные данные при создании пользователя" });
-      } else {
-        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
-      }
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then(
+      User.create({
+        name, about, avatar, email, password,
+      })
+        .then((user) => res.send({ data: user }))
+        .catch((err) => {
+          if (err.name === "ValidationError") {
+            res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Переданы некорректные данные при создании пользователя" });
+          } else {
+            res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
+          }
+        }),
+    )
+    .catch(() => {
+      res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Проблема с хешированием пароля" });
     });
 };
 
