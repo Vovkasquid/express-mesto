@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken"); // импортируем модуль jsonwebtoken
 
-const ERROR_CODE_UNAUTHORIZED = 401;
+const ERROR_CODE_FORBIDDEN= 403;
 
 // eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
   // Проверяем есть ли заголовок и начинается ли он с Bearer
   if (!authorization || !authorization.startsWith("Bearer ")) {
     return res
-      .status(ERROR_CODE_UNAUTHORIZED)
+      .status(ERROR_CODE_FORBIDDEN)
       .send({ message: "Необходима авторизация" });
   }
   // Отделяем токен от Bearer
@@ -21,7 +21,7 @@ module.exports = (req, res, next) => {
     payload = jwt.verify(token, "strongest-key-ever");
   } catch (err) {
     return res
-      .status(ERROR_CODE_UNAUTHORIZED)
+      .status(ERROR_CODE_FORBIDDEN)
       .send({ message: "Необходима авторизация" });
   }
 

@@ -41,6 +41,31 @@ const getUser = (req, res) => {
     });
 };
 
+// Колбек получения данных текущего пользователя
+const getCurrentUser = (req, res) => {
+  // Ищем пользователя по сохраннёному полю в мидлвэре
+  User.findById(req.user)
+    .orFail(() => {
+      // Если мы здесь, значит запрос в базе ничего не нашёл
+      // Бросаем ошибку и попадаем в catch
+      const error = new Error("Пользователь по заданному ID отсутствует в базе данных");
+      error.statusCode = ERROR_CODE_NOT_FOUND;
+      throw error;
+    })
+    .then((user) => {
+      res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.statusCode === ERROR_CODE_NOT_FOUND) {
+        res.status(ERROR_CODE_NOT_FOUND).send({ message: err.message });
+      } else if (err.name === "CastError") {
+        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Ошибка в формате ID пользователя" });
+      } else {
+        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
+      }
+    });
+};
+
 // колбек для создания нового пользователя
 const createUser = (req, res) => {
   const {
@@ -136,5 +161,5 @@ const updateUserAvatar = (req, res) => {
 };
 
 module.exports = {
-  getAllUsers, getUser, createUser, updateUserInfo, updateUserAvatar,
+  getAllUsers, getUser, createUser, updateUserInfo, updateUserAvatar, getCurrentUser,
 };
