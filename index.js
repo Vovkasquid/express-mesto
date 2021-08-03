@@ -7,7 +7,7 @@ const app = express();
 const usersRoute = require("./routes/users");
 const cardsRoute = require("./routes/cards");
 const { createUser } = require("./controllers/users");
-const login = require("./controllers/login");
+const checkLogin = require("./controllers/login");
 
 //  задаём порт (ведь мы его вроде как не передаем в окружение)
 const { PORT = 3000 } = process.env;
@@ -42,7 +42,7 @@ app.use((req, res, next) => {
 app.use("/", usersRoute);
 app.use("/", cardsRoute);
 // Маршруты для регистрации и авторизации
-app.post("/signin", login);
+app.post("/signin", checkLogin);
 app.post("/signup", createUser);
 // Обработаем некорректный маршрут и вернём ошибку 404
 app.use("*", (req, res) => {

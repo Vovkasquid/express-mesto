@@ -6,8 +6,10 @@ const ERROR_CODE_UNAUTHORIZED = 401;
 const ERROR_CODE_DEFAULT_ERROR = 500;
 
 const checkLogin = (req, res) => {
+  console.log("внутри ЧекЛогин");
   const { email, password } = req.body;
-  User.findOne(email)
+  console.log("мыло и пароль = ", email, password);
+  User.findOne({ email })
     .orFail(() => {
       // Если мы здесь, значит запрос в базе ничего не нашёл
       // Бросаем ошибку и попадаем в catch
@@ -17,8 +19,10 @@ const checkLogin = (req, res) => {
     })
     .then((user) => {
       // Надо проверить пароль
+      console.log("Внутри ФайнВан");
       bcrypt.compare(password, user.password)
         .then((matched) => {
+          console.log("Matched = ", matched);
           if (!matched) {
             // Если мы здесь, значит Хэши не совпали. Бросаем ошибку и уходим в catch
             const error = new Error("Введён неправильный пароль");
