@@ -4,6 +4,7 @@ const User = require("../models/user");
 const ERROR_CODE_NOT_FOUND = 404;
 const ERROR_CODE_BAD_REQUEST = 400;
 const ERROR_CODE_DEFAULT_ERROR = 500;
+const ERROR_CODE_CONFLICT = 409;
 
 // колбек для получения всех пользователей
 const getAllUsers = (req, res) => {
@@ -46,7 +47,7 @@ const createUser = (req, res) => {
     name, about, avatar, email, password,
   } = req.body;
   bcrypt.hash(password, 10)
-    .then(
+    .then(() => {
       User.create({
         name, about, avatar, email, password,
       })
@@ -54,11 +55,13 @@ const createUser = (req, res) => {
         .catch((err) => {
           if (err.name === "ValidationError") {
             res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Переданы некорректные данные при создании пользователя" });
+          } else if (err.name === "MongoError") {
+            res.status(ERROR_CODE_CONFLICT).send({ message: "Данный пользователь уже зарегистрирован" });
           } else {
-            res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
+            res.status(ERROR_CODE_DEFAULT_ERROR).send( { message: "Что-то пошло не так :(" });
           }
-        }),
-    )
+        });
+    })
     .catch(() => {
       res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Проблема с хешированием пароля" });
     });

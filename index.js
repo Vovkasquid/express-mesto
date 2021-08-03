@@ -6,6 +6,8 @@ const app = express();
 // Подключаем роуты
 const usersRoute = require("./routes/users");
 const cardsRoute = require("./routes/cards");
+const { createUser } = require("./controllers/users");
+const login = require("./controllers/login");
 
 //  задаём порт (ведь мы его вроде как не передаем в окружение)
 const { PORT = 3000 } = process.env;
@@ -39,6 +41,9 @@ app.use((req, res, next) => {
 // Прописываем маршруты
 app.use("/", usersRoute);
 app.use("/", cardsRoute);
+// Маршруты для регистрации и авторизации
+app.post("/signin", login);
+app.post("/signup", createUser);
 // Обработаем некорректный маршрут и вернём ошибку 404
 app.use("*", (req, res) => {
   res.status(ERROR_CODE_NOT_FOUND).send({ message: `Страницы по адресу ${req.baseUrl} не существует` });
