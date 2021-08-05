@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken"); // импортируем модуль jsonwebtoken
 
-const ERROR_CODE_FORBIDDEN= 403;
+const ERROR_CODE_FORBIDDEN = 403;
 
 // eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
