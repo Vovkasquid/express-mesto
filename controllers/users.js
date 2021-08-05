@@ -80,7 +80,7 @@ const createUser = (req, res) => {
         .catch((err) => {
           if (err.name === "ValidationError") {
             res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Переданы некорректные данные при создании пользователя" });
-          } else if (err.name === "MongoError") {
+          } else if (err.name === "MongoError" && err.code === 11000) {
             res.status(ERROR_CODE_CONFLICT).send({ message: "Данный пользователь уже зарегистрирован" });
           } else {
             res.status(ERROR_CODE_DEFAULT_ERROR).send( { message: "Что-то пошло не так :(" });
