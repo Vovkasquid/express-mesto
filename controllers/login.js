@@ -7,7 +7,7 @@ const ERROR_CODE_DEFAULT_ERROR = 500;
 
 const checkLogin = (req, res) => {
   const { email, password } = req.body;
-  User.findOne({ email })
+  User.findOne({ email }).select("+password")
     .orFail(() => {
       // Если мы здесь, значит запрос в базе ничего не нашёл
       // Бросаем ошибку и попадаем в catch
