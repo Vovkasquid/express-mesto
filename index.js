@@ -8,6 +8,7 @@ const usersRoute = require("./routes/users");
 const cardsRoute = require("./routes/cards");
 const { createUser } = require("./controllers/users");
 const checkLogin = require("./controllers/login");
+const errorsHandler = require("./middlewares/errorsHandler");
 
 //  задаём порт (ведь мы его вроде как не передаем в окружение)
 const { PORT = 3000 } = process.env;
@@ -35,6 +36,8 @@ app.post("/signup", createUser);
 app.use("*", (req, res) => {
   res.status(ERROR_CODE_NOT_FOUND).send({ message: `Страницы по адресу ${req.baseUrl} не существует` });
 });
+// Добавим обработчик ошибок
+app.use(errorsHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
