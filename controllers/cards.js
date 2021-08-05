@@ -10,6 +10,7 @@ const Card = require("../models/card");
 const ERROR_CODE_NOT_FOUND = 404;
 const ERROR_CODE_BAD_REQUEST = 400;
 const ERROR_CODE_DEFAULT_ERROR = 500;
+const ERROR_CODE_FORBIDDEN = 403;
 
 const getAllCards = (req, res) => {
   Card.find({})
@@ -48,15 +49,27 @@ const deleteCard = (req, res) => {
       throw error;
     })
     .then((card) => {
-      card.remove();
-      res.status(200)
-        .send({ message: `Карточка с id ${card.id} успешно удалена!` });
+      // Надо проверить может ли пользователь удалить эту карточку
+      // user._id приходит с типом string, а card.owner._id приходит с форматом object
+      // необходимо привести к строке
+      if (req.user._id !== card.owner.toString()) {
+        // Бросаем ошибку, что пользователь не может это делать
+        const error = new Error("Нельзя удалить чужую карточку");
+        error.statusCode = ERROR_CODE_FORBIDDEN;
+        throw error;
+      } else {
+        card.remove();
+        res.status(200)
+          .send({ message: `Карточка с id ${card.id} успешно удалена!` });
+      }
     })
     .catch((err) => {
-      if (err.statusCode === 404) {
+      if (err.statusCode === ERROR_CODE_NOT_FOUND) {
         res.status(ERROR_CODE_NOT_FOUND).send({ message: err.message });
       } else if (err.name === "CastError") {
         res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Ошибка в формате ID карточки" });
+      } else if (err.statusCode === ERROR_CODE_FORBIDDEN) {
+        res.status(ERROR_CODE_FORBIDDEN).send({ message: err.message });
       } else {
         res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
       }
