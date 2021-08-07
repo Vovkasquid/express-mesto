@@ -2,7 +2,6 @@ const router = require("express").Router();
 const {
   getAllCards, createCard, deleteCard, likeCard, dislikeCard,
 } = require("../controllers/cards");
-const auth = require("../middlewares/auth");
 
 /* GET /cards — возвращает все карточки
    POST /cards — создаёт карточку
@@ -11,14 +10,14 @@ const auth = require("../middlewares/auth");
    DELETE /cards/:cardId/likes — убрать лайк с карточки
 */
 
-router.get("/cards", auth, getAllCards);
+router.get("/cards", getAllCards);
 
-router.post("/cards", auth, createCard);
+router.post("/cards",createCard);
 
-router.delete("/cards/:cardId", auth, deleteCard);
+router.delete("/cards/:cardId", deleteCard);
 
-router.put("/cards/:cardId/likes", auth, likeCard);
+router.put("/cards/:cardId/likes", likeCard);
 
-router.delete("/cards/:cardId/likes", auth, dislikeCard);
+router.delete("/cards/:cardId/likes", dislikeCard);
 
 module.exports = router;

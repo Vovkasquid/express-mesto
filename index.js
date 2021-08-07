@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const { errors } = require("celebrate");
 
 const app = express();
 
@@ -9,6 +10,7 @@ const cardsRoute = require("./routes/cards");
 const { createUser } = require("./controllers/users");
 const checkLogin = require("./controllers/login");
 const errorsHandler = require("./middlewares/errorsHandler");
+const auth = require("./middlewares/auth");
 
 //  задаём порт (ведь мы его вроде как не передаем в окружение)
 const { PORT = 3000 } = process.env;
@@ -26,16 +28,20 @@ mongoose.connect("mongodb://localhost:27017/mestodb", {
 // bodyparser теперь часть экспресса, поэтому подключаем его так
 app.use(express.json());
 
-// Прописываем маршруты
-app.use("/", usersRoute);
-app.use("/", cardsRoute);
 // Маршруты для регистрации и авторизации
 app.post("/signin", checkLogin);
 app.post("/signup", createUser);
+// Защищаем пути авторизацией
+app.use(auth);
+// Прописываем маршруты
+app.use("/", usersRoute);
+app.use("/", cardsRoute);
 // Обработаем некорректный маршрут и вернём ошибку 404
 app.use("*", (req, res) => {
   res.status(ERROR_CODE_NOT_FOUND).send({ message: `Страницы по адресу ${req.baseUrl} не существует` });
 });
+// Добавим обработчик ошибок для celebrate
+app.use(errors());
 // Добавим обработчик ошибок
 app.use(errorsHandler);
 
