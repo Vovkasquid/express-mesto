@@ -6,23 +6,24 @@
 */
 
 const Card = require("../models/card");
+const Error400 = require("../errors/Error400");
+const Error404 = require("../errors/Error404");
+const Error403 = require("../errors/Error403");
+const Error500 = require("../errors/Error500");
 
-const ERROR_CODE_NOT_FOUND = 404;
-const ERROR_CODE_BAD_REQUEST = 400;
-const ERROR_CODE_DEFAULT_ERROR = 500;
-const ERROR_CODE_FORBIDDEN = 403;
+const ERROR_NOT_FOUND = 404;
 
-const getAllCards = (req, res) => {
+const getAllCards = (req, res, next) => {
   Card.find({})
     .then((cards) => {
       res.status(200).send({ data: cards });
     })
     .catch(() => {
-      res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
+      next(new Error500("Что-то пошло не так :("));
     });
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
@@ -31,22 +32,20 @@ const createCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Переданы некорректные данные при создании пользователя" });
+        next(new Error400("Переданы некорректные данные при создании карточки"));
       } else {
-        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
+        next(new Error500("Что-то пошло не так :("));
       }
     });
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   // найдём карточку и удалим её
   Card.findById(req.params.cardId)
     .orFail(() => {
       // Если мы здесь, значит запрос в базе ничего не нашёл
       // Бросаем ошибку и попадаем в catch
-      const error = new Error("Карточка с заданным ID отсутствует в базе данных");
-      error.statusCode = ERROR_CODE_NOT_FOUND;
-      throw error;
+      throw new Error404("Карточка с заданным ID отсутствует в базе данных");
     })
     .then((card) => {
       // Надо проверить может ли пользователь удалить эту карточку
@@ -54,9 +53,7 @@ const deleteCard = (req, res) => {
       // необходимо привести к строке
       if (req.user._id !== card.owner.toString()) {
         // Бросаем ошибку, что пользователь не может это делать
-        const error = new Error("Нельзя удалить чужую карточку");
-        error.statusCode = ERROR_CODE_FORBIDDEN;
-        throw error;
+        next(new Error403("Нельзя удалить чужую карточку"));
       } else {
         card.remove();
         res.status(200)
@@ -64,19 +61,17 @@ const deleteCard = (req, res) => {
       }
     })
     .catch((err) => {
-      if (err.statusCode === ERROR_CODE_NOT_FOUND) {
-        res.status(ERROR_CODE_NOT_FOUND).send({ message: err.message });
-      } else if (err.name === "CastError") {
-        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Ошибка в формате ID карточки" });
-      } else if (err.statusCode === ERROR_CODE_FORBIDDEN) {
-        res.status(ERROR_CODE_FORBIDDEN).send({ message: err.message });
+      if (err.name === "CastError") {
+        next(new Error400("Ошибка в формате ID карточки"));
+      } else if (err.statusCode === ERROR_NOT_FOUND) {
+        next(err);
       } else {
-        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
+        next(new Error500("Что-то пошло не так :("));
       }
     });
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
@@ -84,26 +79,23 @@ const likeCard = (req, res) => {
   )
     .orFail(() => {
       // Если мы здесь, значит запрос в базе ничего не нашёл
-      // Бросаем ошибку и попадаем в catch
-      const error = new Error("Карточка с заданным ID отсутствует в базе данных");
-      error.statusCode = ERROR_CODE_NOT_FOUND;
-      throw error;
+      throw new Error404("Карточка с заданным ID отсутствует в базе данных");
     })
     .then((card) => {
       res.status(200).send({ data: card });
     })
     .catch((err) => {
-      if (err.statusCode === ERROR_CODE_NOT_FOUND) {
-        res.status(ERROR_CODE_NOT_FOUND).send({ message: err.message });
-      } else if (err.name === "CastError") {
-        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Ошибка в формате ID карточки" });
+      if (err.name === "CastError") {
+        next(new Error400("Ошибка в формате ID карточки"));
+      } else if (err.statusCode === ERROR_NOT_FOUND) {
+        next(err);
       } else {
-        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
+        next(new Error500("Что-то пошло не так :("));
       }
     });
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
@@ -111,21 +103,18 @@ const dislikeCard = (req, res) => {
   )
     .orFail(() => {
       // Если мы здесь, значит запрос в базе ничего не нашёл
-      // Бросаем ошибку и попадаем в catch
-      const error = new Error("Карточка с заданным ID отсутствует в базе данных");
-      error.statusCode = ERROR_CODE_NOT_FOUND;
-      throw error;
+      throw new Error404("Карточка с заданным ID отсутствует в базе данных");
     })
     .then((card) => {
       res.status(200).send({ data: card });
     })
     .catch((err) => {
-      if (err.statusCode === ERROR_CODE_NOT_FOUND) {
-        res.status(ERROR_CODE_NOT_FOUND).send({ message: err.message });
-      } else if (err.name === "CastError") {
-        res.status(ERROR_CODE_BAD_REQUEST).send({ message: "Ошибка в формате ID карточки" });
+      if (err.name === "CastError") {
+        next(new Error400("Ошибка в формате ID карточки"));
+      } else if (err.statusCode === ERROR_NOT_FOUND) {
+        next(err);
       } else {
-        res.status(ERROR_CODE_DEFAULT_ERROR).send({ message: "Что-то пошло не так :(" });
+        next(new Error500("Что-то пошло не так :("));
       }
     });
 };

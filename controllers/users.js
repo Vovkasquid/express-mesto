@@ -5,10 +5,7 @@ const Error404 = require("../errors/Error404");
 const Error409 = require("../errors/Error409");
 const Error500 = require("../errors/Error500");
 
-const ERROR_CODE_NOT_FOUND = 404;
-const ERROR_CODE_BAD_REQUEST = 400;
-const ERROR_CODE_DEFAULT_ERROR = 500;
-const ERROR_CODE_CONFLICT = 409;
+const ERROR_NOT_FOUND = 404;
 
 // колбек для получения всех пользователей
 const getAllUsers = (req, res, next) => {
@@ -26,7 +23,8 @@ const getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(() => {
       // Если мы здесь, значит запрос в базе ничего не нашёл
-      next(new Error404("Пользователь по заданному ID отсутствует в базе данных"));
+      // Кидаем ошибку, потому что иначе orFail все равно вызовет catch >_<
+      throw (new Error404("Пользователь по заданному ID отсутствует в базе данных"));
     })
     .then((user) => {
       res.status(200).send({ data: user });
@@ -34,6 +32,8 @@ const getUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === "CastError") {
         next(new Error400("Ошибка в формате ID пользователя"));
+      } else if (err.statusCode === ERROR_NOT_FOUND) {
+        next(err);
       } else {
         next(new Error500("Что-то пошло не так :("));
       }
@@ -54,6 +54,8 @@ const getCurrentUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === "CastError") {
         next(new Error400("Ошибка в формате ID пользователя"));
+      } else if (err.statusCode === ERROR_NOT_FOUND) {
+        next(err);
       } else {
         next(new Error500("Что-то пошло не так :("));
       }
@@ -111,6 +113,8 @@ const updateUserInfo = (req, res, next) => {
         next(new Error400("Ошибка в формате ID пользователя"));
       } else if (err.name === "ValidationError") {
         next(new Error400("Переданы некорректные данные при обновлении данных пользователя"));
+      } else if (err.statusCode === ERROR_NOT_FOUND) {
+        next(err);
       } else {
         next(new Error500("Что-то пошло не так :("));
       }
@@ -142,6 +146,8 @@ const updateUserAvatar = (req, res, next) => {
         next(new Error400("Ошибка в формате ID пользователя"));
       } else if (err.name === "ValidationError") {
         next(new Error400("Переданы некорректные данные при обновлении данных пользователя"));
+      } else if (err.statusCode === ERROR_NOT_FOUND) {
+        next(err);
       } else {
         next(new Error500("Что-то пошло не так :("));
       }
