@@ -17,10 +17,23 @@ router.get("/users", getAllUsers);
 
 router.get("/users/me", getCurrentUser);
 
-router.get("/users/:userId", getUser);
+router.get("/users/:userId", celebrate({
+  params: Joi.object().keys({
+    userID: Joi.string().length(24).hex(),
+  }),
+}), getUser);
 
-router.patch("/users/me", updateUserInfo);
+router.patch("/users/me", celebrate({
+  params: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
+  }),
+}), updateUserInfo);
 
-router.patch("/users/me/avatar", updateUserAvatar);
+router.patch("/users/me/avatar", celebrate({
+  params: Joi.object().keys({
+    avatar: Joi.string().required(),
+  }),
+}), updateUserAvatar);
 
 module.exports = router;
