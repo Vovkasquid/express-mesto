@@ -4,7 +4,6 @@ const {
   getAllUsers, getUser, getCurrentUser, updateUserInfo, updateUserAvatar,
 } = require("../controllers/users");
 
-const auth = require("../middlewares/auth");
 /*
 GET /users — возвращает всех пользователей
 GET /users/:userId - возвращает пользователя по _id
