@@ -15,7 +15,6 @@ const auth = require("./middlewares/auth");
 
 //  задаём порт (ведь мы его вроде как не передаем в окружение)
 const { PORT = 3000 } = process.env;
-const ERROR_CODE_NOT_FOUND = 404;
 
 // подключаемся к серверу mongo
 mongoose.connect("mongodb://localhost:27017/mestodb", {

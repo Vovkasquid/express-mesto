@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
   // Проверяем есть ли заголовок и начинается ли он с Bearer
   if (!authorization || !authorization.startsWith("Bearer ")) {
-    next(new Error403("Необходима авторизация"));
+    return next(new Error403("Необходима авторизация"));
   }
   // Отделяем токен от Bearer
   const token = authorization.replace("Bearer ", "");
