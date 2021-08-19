@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const { errors, celebrate, Joi } = require("celebrate");
+const Error404 = require("./errors/Error404");
 
 const app = express();
 
@@ -50,8 +51,8 @@ app.use(auth);
 app.use("/", usersRoute);
 app.use("/", cardsRoute);
 // Обработаем некорректный маршрут и вернём ошибку 404
-app.use("*", (req, res) => {
-  res.status(ERROR_CODE_NOT_FOUND).send({ message: `Страницы по адресу ${req.baseUrl} не существует` });
+app.use("*", (req, res, next) => {
+  next(new Error404(`Страницы по адресу ${req.baseUrl} не существует`));
 });
 // Добавим обработчик ошибок для celebrate
 app.use(errors());
