@@ -3,6 +3,7 @@ const { celebrate, Joi } = require("celebrate");
 const {
   getAllCards, createCard, deleteCard, likeCard, dislikeCard,
 } = require("../controllers/cards");
+const urlValidator = require("../utils/urlValidator");
 
 /* GET /cards — возвращает все карточки
    POST /cards — создаёт карточку
@@ -16,7 +17,7 @@ router.get("/cards", getAllCards);
 router.post("/cards", celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
-    link: Joi.string().required(),
+    link: Joi.string().required().custom(urlValidator),
   }),
 }), createCard);
 
