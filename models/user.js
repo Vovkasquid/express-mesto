@@ -24,9 +24,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     validate: {
-      validator: (email) => {
-        return validatorModule.isEmail(email);
-      },
+      validator: (email) => validatorModule.isEmail(email),
       message: (props) => `${props.value} не является электронной почтой!`,
     },
   },
