@@ -9,6 +9,7 @@ const ERROR_CODE_UNAUTHORIZED = 401;
 
 const checkLogin = (req, res, next) => {
   const { email, password } = req.body;
+  const { JWT_SECRET = "strongest-key-ever" } = process.env;
   User.findOne({ email }).select("+password")
     .orFail(() => {
       // Если мы здесь, значит запрос в базе ничего не нашёл
@@ -26,7 +27,7 @@ const checkLogin = (req, res, next) => {
             throw error;
           }
           // Необходимо создать токен и отправить его пользователю
-          const token = jwt.sign({ _id: user._id }, "strongest-key-ever", { expiresIn: "7d" });
+          const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
           res.send({ token });
         })
         .catch((err) => {

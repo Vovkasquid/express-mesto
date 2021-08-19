@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+require("dotenv").config();
 const { errors, celebrate, Joi } = require("celebrate");
 const Error404 = require("./errors/Error404");
 

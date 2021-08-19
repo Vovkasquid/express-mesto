@@ -3,6 +3,7 @@ const Error403 = require("../errors/Error403");
 
 // eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
+  const { JWT_SECRET = "strongest-key-ever" } = process.env;
   const { authorization } = req.headers;
   // Проверяем есть ли заголовок и начинается ли он с Bearer
   if (!authorization || !authorization.startsWith("Bearer ")) {
@@ -15,7 +16,7 @@ module.exports = (req, res, next) => {
   // Чтобы отловить ошибки оборачиваем в try-catch
   try {
     // Вытаскиваем айди из токена
-    payload = jwt.verify(token, "strongest-key-ever");
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     next(new Error403("Необходима авторизация"));
   }
