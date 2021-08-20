@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const { errors, celebrate, Joi } = require("celebrate");
+const helmet = require("helmet");
 const Error404 = require("./errors/Error404");
 
 const limiter = require("./utils/limiter");
@@ -33,6 +34,9 @@ app.use(express.json());
 
 // Подключаем ограничитель запросов
 app.use(limiter);
+
+// Включаем защиту заголовков
+app.use(helmet());
 
 // Маршруты для регистрации и авторизации
 app.post("/signin", celebrate({
