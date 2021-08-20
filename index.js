@@ -4,6 +4,8 @@ require("dotenv").config();
 const { errors, celebrate, Joi } = require("celebrate");
 const Error404 = require("./errors/Error404");
 
+const limiter = require("./utils/limiter");
+
 const app = express();
 
 // Подключаем роуты
@@ -28,6 +30,9 @@ mongoose.connect("mongodb://localhost:27017/mestodb", {
 // подключаем мидлвары, роуты и всё остальное...
 // bodyparser теперь часть экспресса, поэтому подключаем его так
 app.use(express.json());
+
+// Подключаем ограничитель запросов
+app.use(limiter);
 
 // Маршруты для регистрации и авторизации
 app.post("/signin", celebrate({
